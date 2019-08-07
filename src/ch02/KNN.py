@@ -121,3 +121,25 @@ def handwritingClassTest():
         if (classifierResult != classNumStr): errorCount += 1.0
     print("\nthe total number of errors is: %{}".format(errorCount))
     print("\nthe total error rate is: {}".format(errorCount/float(mTest)))
+
+
+def classifyHandwriting(imagePath):
+    mat=img2vector(imagePath)
+    hwLabels = []
+    trainingFileList = listdir('digits/trainingDigits')  # load the training set
+    m = len(trainingFileList)
+    trainingMat = zeros((m, 1024))
+    for i in range(m):
+        fileNameStr = trainingFileList[i]
+        fileStr = fileNameStr.split('.')[0]  # take off .txt
+        classNumStr = int(fileStr.split('_')[0])
+        hwLabels.append(classNumStr)
+        trainingMat[i, :] = img2vector('digits/trainingDigits/{}'.format(fileNameStr))
+    classifierResult = classify0(mat, trainingMat, hwLabels, 3)
+    print(classifierResult)
+
+#datingClassTest()#约会数据测试
+#classifyPerson()#预测
+
+#handwritingClassTest()#手写数据测试
+classifyHandwriting('digits/0test.txt')#预测

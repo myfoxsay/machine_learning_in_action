@@ -82,9 +82,9 @@ def majoritycnt(classList):
         if vote not in classCount.keys():
             classCount[vote] = 0
             classCount[vote] += 1
-            sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
+        sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
 
-            return sortedClassCount
+        return sortedClassCount
 
 
 def create_tree(dataSet, labels):
@@ -109,11 +109,11 @@ def create_tree(dataSet, labels):
         sublables = labels[:]
         mytree[bestfaetlabel][value] = create_tree(split_dataset(dataSet, bestfaet, value), sublables)
 
-        return mytree
+    return mytree
 
 
 def classify(inputtree, featlabels, testvec):
-    firststr = inputtree.keys()[0]
+    firststr = list(inputtree.keys())[0]
     seconddict = inputtree[firststr]
     featindex = featlabels.index(firststr)
     key = testvec[featindex]
@@ -126,12 +126,42 @@ def classify(inputtree, featlabels, testvec):
 
 
 def store_tree(inputtree, filename):
-    fw = open(filename, 'w')
+    fw = open(filename, 'wb')
     pickle.dump(inputtree, fw)
     fw.close()
 
 
 def grab_tree(filename):
     import pickle
-    fr = open(filename)
+    fr = open(filename,'rb')
     return pickle.load(fr)
+
+#一个demo
+myDat,labels=create_dataset()#准备数据集
+templabel=[]
+for i in labels:
+    templabel.append(i)
+mytree=create_tree(myDat,templabel)#构建决策树
+print(mytree)
+store_tree(mytree,'决策树.txt')#存储决策树实例
+storedtree=grab_tree('决策树.txt')#读取决策树实例
+print(storedtree)
+result=classify(mytree,labels,[0,1])#预测结果
+print(result)
+
+
+
+#隐形眼镜决策树
+file=open('lensesChinese.txt','r',encoding='utf-8')
+lensesLabels=['年龄','诊断','散光','泪率']
+lensesMat= [lineOne.strip().split('\t') for lineOne in file.readlines()];
+print(lensesMat)
+#创建决策树
+lensesTree=create_tree(lensesMat,lensesLabels)
+print(lensesTree)
+#绘制决策树
+from src.ch03 import treePlotter
+#treePlotter.create_plot(lensesTree)
+#存储决策树
+store_tree(lensesTree,'隐形眼镜决策树.txt')
+treePlotter.create_plot(grab_tree('隐形眼镜决策树.txt'))
